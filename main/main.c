@@ -90,8 +90,10 @@ static void on_picc_state_changed(void *arg, esp_event_base_t base, int32_t even
             ESP_LOGW(TAG, "Unidentified User Name");
 		    ESP_LOGW(TAG, "Access Denied! %d Try", failed_attempts);	
 		    if (failed_attempts >= 3) {
+		        gpio_set_level(OUT_PIN3, 1 );
 		        ESP_LOGE(TAG, "3 Times Wrong, Wait for 1 Minute...");
-		        vTaskDelay(pdMS_TO_TICKS(60000)); 
+		        vTaskDelay(pdMS_TO_TICKS(60000));
+		        gpio_set_level(OUT_PIN3, 0 ); 
 		        failed_attempts = 0; 
 		    }
         }

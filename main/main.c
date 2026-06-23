@@ -28,7 +28,7 @@ static const char *TAG = "User";
 
 static const uint8_t authorized_uids[MAX_AUTHORIZED_CARDS][MAX_UID_LEN] = {
 {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // your spesific card UID max 7 byte
-{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}  // If UID less then 7 byte
+{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}  // If UID less then 7 byte you can empty several byte
 };
 
 void play_tone(uint32_t freq, uint32_t duration_ms) {
@@ -70,10 +70,11 @@ static bool is_authorized(uint8_t *uid, uint8_t len) {
 }
 static void on_picc_state_changed(void *arg, esp_event_base_t base, int32_t event_id, void *data)
 {
+	
     rc522_picc_state_changed_event_t *event = (rc522_picc_state_changed_event_t *)data;
     rc522_picc_t *picc = event->picc;
     if (picc->state == RC522_PICC_STATE_ACTIVE) {
-
+		
         if (is_authorized(picc->uid.value, picc->uid.length)) {
             is_lamp_on = !is_lamp_on;
             failed_attempts = 0;
@@ -85,6 +86,7 @@ static void on_picc_state_changed(void *arg, esp_event_base_t base, int32_t even
             gpio_set_level(OUT_PIN2, 0 );
             ESP_LOGI(TAG, "Access Granted");
             ESP_LOGI(TAG, "Your_User_Name");
+            
         } else {
 			failed_attempts++;
 			gpio_set_level(OUT_PIN3, 1 );

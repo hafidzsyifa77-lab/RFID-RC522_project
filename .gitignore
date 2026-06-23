@@ -1,0 +1,6 @@
+﻿build/
+.vscode/
+.idea/
+sdkconfig.old
+*.bak
+.espressif/

@@ -28,7 +28,7 @@ static const char *TAG = "User";
 
 static const uint8_t authorized_uids[MAX_AUTHORIZED_CARDS][MAX_UID_LEN] = {
 {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // your spesific card UID max 7 byte
-{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}  // If UID less then 7 byte you can empty several byte
+{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}  // If the UID is less than 7 bytes, you can leave the last few bytes blank
 };
 
 void play_tone(uint32_t freq, uint32_t duration_ms) {

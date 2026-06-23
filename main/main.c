@@ -10,9 +10,9 @@
 static const char *TAG = "User";
 
 static const uint8_t authorized_uid[] = 
-{0x04, 0x59, 0x4A,
- 0xD2, 0x20, 0x77,
- 0x80}; 
+{0xAA, 0xBB, 0xCC,
+ 0xDD, 0xEE, 0xFF,
+ 0x00}; // your spesific card UID 
  
 #define RC522_SPI_BUS_GPIO_MISO    (25)
 #define RC522_SPI_BUS_GPIO_MOSI    (23)
@@ -72,23 +72,23 @@ static void on_picc_state_changed(void *arg, esp_event_base_t base, int32_t even
             is_lamp_on = !is_lamp_on;
             failed_attempts = 0;
             gpio_set_level(OUT_PIN, is_lamp_on ? 1 : 0);
-            gpio_set_level(OUT_PIN3, 1 );
+            gpio_set_level(OUT_PIN2, 1 );
             play_tone(1500, 100); 
             vTaskDelay(pdMS_TO_TICKS(50));
             play_tone(2000, 150);
-            gpio_set_level(OUT_PIN3, 0 );
+            gpio_set_level(OUT_PIN2, 0 );
             ESP_LOGI(TAG, "Access Granted");
-            ESP_LOGI(TAG, "Hafidz Al-Aminudin");
+            ESP_LOGI(TAG, "Your_User_Name");
         } else {
 			failed_attempts++;
-			gpio_set_level(OUT_PIN2, 1 );
+			gpio_set_level(OUT_PIN3, 1 );
             play_tone(400, 150);
             vTaskDelay(pdMS_TO_TICKS(50));
             play_tone(400, 150);
-            gpio_set_level(OUT_PIN2, 0 );
+            gpio_set_level(OUT_PIN3, 0 );
             ESP_LOGW(TAG, "Access Denied!");
             ESP_LOGW(TAG, "Unidentified User Name");
-		            ESP_LOGW(TAG, "Access Denied! %d Try", failed_attempts);	
+		    ESP_LOGW(TAG, "Access Denied! %d Try", failed_attempts);	
 		    if (failed_attempts >= 3) {
 		        ESP_LOGE(TAG, "3 Times Wrong, Wait for 1 Minute...");
 		        vTaskDelay(pdMS_TO_TICKS(60000)); 

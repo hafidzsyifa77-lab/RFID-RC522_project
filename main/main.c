@@ -9,11 +9,6 @@
 
 static const char *TAG = "User";
 
-static const uint8_t authorized_uid[] = 
-{0xAA, 0xBB, 0xCC,
- 0xDD, 0xEE, 0xFF,
- 0x00}; // your spesific card UID 
- 
 #define RC522_SPI_BUS_GPIO_MISO    (25)
 #define RC522_SPI_BUS_GPIO_MOSI    (23)
 #define RC522_SPI_BUS_GPIO_SCLK    (19)
@@ -28,6 +23,13 @@ static const uint8_t authorized_uid[] =
 #define LEDC_MODE        LEDC_LOW_SPEED_MODE
 #define LEDC_CHANNEL     LEDC_CHANNEL_0
 #define LEDC_DUTY_RES    LEDC_TIMER_13_BIT 
+#define MAX_AUTHORIZED_CARDS 2
+#define MAX_UID_LEN 7
+
+static const uint8_t authorized_uids[MAX_AUTHORIZED_CARDS][MAX_UID_LEN] = {
+{0x04, 0x59, 0x4A, 0xD2, 0x20, 0x77, 0x80}, // your spesific card UID max 7 byte
+{0x8C, 0x20, 0x32, 0x03, 0x00, 0x00, 0x00}  // If UID less then 7 byte
+};
 
 void play_tone(uint32_t freq, uint32_t duration_ms) {
     ledc_set_freq(LEDC_MODE, LEDC_TIMER, freq);
@@ -57,18 +59,22 @@ static int failed_attempts = 0;
 static bool is_lamp_on = false;
 static uint8_t last_uid[4] = {0};
 
+static bool is_authorized(uint8_t *uid, uint8_t len) {
+    for (int i = 0; i < MAX_AUTHORIZED_CARDS; i++) {
+
+        if (memcmp(uid, authorized_uids[i], len) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
 static void on_picc_state_changed(void *arg, esp_event_base_t base, int32_t event_id, void *data)
 {
     rc522_picc_state_changed_event_t *event = (rc522_picc_state_changed_event_t *)data;
     rc522_picc_t *picc = event->picc;
     if (picc->state == RC522_PICC_STATE_ACTIVE) {
-        
-        if (memcmp(picc->uid.value, last_uid, 4) == 0) {
-        }
 
-        memcpy(last_uid, picc->uid.value, 4);
-
-        if (memcmp(picc->uid.value, authorized_uid, 4) == 0) {
+        if (is_authorized(picc->uid.value, picc->uid.length)) {
             is_lamp_on = !is_lamp_on;
             failed_attempts = 0;
             gpio_set_level(OUT_PIN, is_lamp_on ? 1 : 0);
